@@ -6,6 +6,7 @@ ENV TZ="$TZ"
 # Install development tools + firewall utilities
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+    openssh-client \
     less \
     git \
     procps \

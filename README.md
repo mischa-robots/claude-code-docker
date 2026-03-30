@@ -23,10 +23,16 @@ developed for manual Docker management, based on **Node.js 24 LTS**.
 
 ## Quick Start
 
-### With ANTHROPIC_API_KEY
+First step, create the `claude` directory with correct ownership to prevent later errors:
 
 ```bash
-# 1. Copy env file and set your API key
+mkdir -p claude/{config,history,ssh}
+```
+
+You can set the `ANTHROPIC_API_KEY` in your `.env` if you have one or leave it empty, then Claude Code will open an interactive login process.
+
+```bash
+# 1. Copy env file and set your ANTHROPIC API key or leave it blanc
 cp .env.example .env
 $EDITOR .env          # set ANTHROPIC_API_KEY and PROJECT_DIR
 
@@ -34,30 +40,13 @@ $EDITOR .env          # set ANTHROPIC_API_KEY and PROJECT_DIR
 docker compose up --build -d
 
 # 3. Open a shell inside the container
-docker compose exec claude-code zsh
+docker compose exec -it claude-code zsh
 
-# 4. Inside the container: start Claude Code
+# 4. Then inside the container: start Claude Code
 cd /workspace
 claude
 ```
 
-### With Claude Login
-
-```bash
-# 1. Copy env file and leave the API key empty
-cp .env.example .env
-$EDITOR .env          # set ANTHROPIC_API_KEY to ""
-
-# 2. Build and start
-docker compose up --build -d
-
-# 3. Open a shell inside the container
-docker compose exec claude-code zsh
-
-# 4. Inside the container: start Claude Code
-cd /workspace
-claude login         # opens a browser auth flow, saves token to claude/config/
-```
 
 The login is stored in the `claude` directory on the host and is persistent during container rebuilds and restarts.
 
@@ -231,16 +220,19 @@ gets a bit larger but you only manage one container.
 # Start (detached)
 docker compose up -d
 
-# Open a shell
-docker compose exec claude-code zsh
+# Open interactive shell
+docker compose exec -it claude-code zsh
 
-# Stop
+# Stop docker container
+docker compose stop
+
+# Stop and **remove** docker container
 docker compose down
 
 # Rebuild after Dockerfile changes
 docker compose up --build -d
 
-# Remove everything including volumes (loses Claude auth/config!)
+# Remove everything including volumes
 docker compose down -v
 ```
 
