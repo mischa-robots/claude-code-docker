@@ -1,0 +1,78 @@
+services:
+  claude-code:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        TZ: ${TZ:-UTC}
+    image: claude-code:local
+
+    container_name: claude-code
+
+    # Required for iptables/ipset firewall management inside the container.
+    # NET_ADMIN: modify iptables rules, create ipsets, set default DROP policy.
+    # NET_RAW:   send ICMP rejection packets for blocked connections.
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+
+    # Run the firewall initialisation as the first command, then keep the
+    # container alive with a long-running shell.  The '&&' ensures the
+    # container exits immediately if the firewall fails to initialise.
+    command: >
+      /bin/zsh -c "sudo /usr/local/bin/init-firewall.sh && /usr/local/bin/init-ssh.sh && exec /bin/zsh"
+
+    # Keep stdin open so you can `docker compose exec claude-code zsh`
+    stdin_open: true
+    tty: true
+
+    environment:
+      # Pass your Anthropic API key from the host .env file
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      # Optional: override the model
+      # ANTHROPIC_MODEL: claude-opus-4-5
+      TZ: ${TZ:-UTC}
+      NODE_OPTIONS: "--max-old-space-size=4096"
+      CLAUDE_CONFIG_DIR: /home/node/.claude
+
+    volumes:
+      # ── Project source code ──────────────────────────────────────────────
+      # Mount your project directory into /workspace.
+      # Change the left side to the path you want to work on:
+      #   - ./                    (if docker-compose.yml lives inside your project)
+      #   - ../my-project         (sibling directory)
+      #   - /home/you/projects    (shared projects root — see notes in README)
+      - ${PROJECT_DIR:-.}:/workspace:cached
+
+      # ── Persistent Claude config (auth tokens, settings, memory) ─────────
+      # Named volume so it survives `docker compose down` and rebuilds.
+      - claude-config:/home/node/.claude
+
+      # ── Persistent shell history ──────────────────────────────────────────
+      - claude-history:/commandhistory
+
+      # ── Persistent SSH keys (optional — for GitHub access)
+      # Generated on first run, survives rebuilds.
+      # Add the printed public key to GitHub → Settings → SSH keys once.
+      - claude-ssh:/home/node/.ssh
+
+    # Expose nothing by default — Claude Code is a CLI tool.
+    # Uncomment below if you run a dev server inside the container:
+    # ports:
+    #   - "3000:3000"
+    #   - "8080:8080"
+
+    # Restart policy: "no" is safest for an interactive dev tool.
+    restart: "no"
+
+volumes:
+  claude-config:
+    # Stores Claude auth tokens, settings, project memory.
+    # Remove with:  docker volume rm claude-code_claude-config
+    name: claude-code_claude-config
+
+  claude-history:
+    name: claude-code_claude-history
+
+  claude-ssh:
+    name: claude-code_claude-ssh
