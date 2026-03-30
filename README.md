@@ -23,6 +23,8 @@ developed for manual Docker management, based on **Node.js 24 LTS**.
 
 ## Quick Start
 
+### With ANTHROPIC_API_KEY
+
 ```bash
 # 1. Copy env file and set your API key
 cp .env.example .env
@@ -38,6 +40,26 @@ docker compose exec claude-code zsh
 cd /workspace
 claude
 ```
+
+### With Claude Login
+
+```bash
+# 1. Copy env file and leave the API key empty
+cp .env.example .env
+$EDITOR .env          # set ANTHROPIC_API_KEY to ""
+
+# 2. Build and start
+docker compose up --build -d
+
+# 3. Open a shell inside the container
+docker compose exec claude-code zsh
+
+# 4. Inside the container: start Claude Code
+cd /workspace
+claude login         # opens a browser auth flow, saves token to claude/config/
+```
+
+The login is stored in the `claude` directory on the host and is persistent during container rebuilds and restarts.
 
 ## Installed services
 
