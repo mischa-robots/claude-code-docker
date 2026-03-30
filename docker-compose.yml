@@ -56,9 +56,9 @@ services:
 
     # Expose nothing by default — Claude Code is a CLI tool.
     # Uncomment below if you run a dev server inside the container:
-    # ports:
-    #   - "3000:3000"
-    #   - "8080:8080"
+    ports:
+      - "3000:3000"
+      - "8080:8080"
 
     # Restart policy: "no" is safest for an interactive dev tool.
     restart: "no"

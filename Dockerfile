@@ -27,6 +27,8 @@ RUN apt-get update && \
     vim \
     wget \
     curl \
+    python3 \
+    python3-pip \
     ca-certificates && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

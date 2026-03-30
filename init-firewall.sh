@@ -78,6 +78,23 @@ ALLOWED_DOMAINS=(
     "deb.nodesource.com"
     "archive.ubuntu.com"
     "security.ubuntu.com"
+
+    # Google Fonts
+    "fonts.googleapis.com"
+    "fonts.gstatic.com"
+
+    # Common CDNs
+    "cdn.jsdelivr.net"
+    "cdnjs.cloudflare.com"
+    "unpkg.com"
+
+    # Images & assets
+    "images.unsplash.com"
+    "plus.unsplash.com"
+
+    # Common package registries
+    "pypi.org"
+    "files.pythonhosted.org"
 )
 
 for domain in "${ALLOWED_DOMAINS[@]}"; do
