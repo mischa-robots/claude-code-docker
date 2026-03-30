@@ -1,0 +1,13 @@
+# ── Secrets ───────────────────────────────────────────────────────────────────
+.env
+
+# ── Claude runtime data (config, history, SSH keys) ───────────────────────────
+claude/
+
+# ── Projects (cloned separately on host, not part of this repo) ───────────────
+projects/*
+!projects/.gitkeep
+
+# ── OS cruft ──────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

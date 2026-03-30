@@ -44,17 +44,15 @@ services:
       #   - /home/you/projects    (shared projects root — see notes in README)
       - ${PROJECT_DIR:-.}:/workspace:cached
 
-      # ── Persistent Claude config (auth tokens, settings, memory) ─────────
-      # Named volume so it survives `docker compose down` and rebuilds.
-      - claude-config:/home/node/.claude
+      # ── Claude config (auth tokens, project memory, settings) ────────────
+      - ./claude/config:/home/node/.claude
 
-      # ── Persistent shell history ──────────────────────────────────────────
-      - claude-history:/commandhistory
+      # ── Shell history ────────────────────────────────────────────────────
+      - ./claude/history:/commandhistory
 
-      # ── Persistent SSH keys (optional — for GitHub access)
-      # Generated on first run, survives rebuilds.
-      # Add the printed public key to GitHub → Settings → SSH keys once.
-      - claude-ssh:/home/node/.ssh
+      # ── SSH keys (optional — for GitHub access) ──────────────────────────
+      # Generated on first run. Add the printed public key to GitHub once.
+      - ./claude/ssh:/home/node/.ssh
 
     # Expose nothing by default — Claude Code is a CLI tool.
     # Uncomment below if you run a dev server inside the container:
@@ -64,15 +62,3 @@ services:
 
     # Restart policy: "no" is safest for an interactive dev tool.
     restart: "no"
-
-volumes:
-  claude-config:
-    # Stores Claude auth tokens, settings, project memory.
-    # Remove with:  docker volume rm claude-code_claude-config
-    name: claude-code_claude-config
-
-  claude-history:
-    name: claude-code_claude-history
-
-  claude-ssh:
-    name: claude-code_claude-ssh
