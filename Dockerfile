@@ -4,7 +4,8 @@ ARG TZ=UTC
 ENV TZ="$TZ"
 
 # Install development tools + firewall utilities
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
     less \
     git \
     procps \
@@ -25,8 +26,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     vim \
     wget \
     curl \
-    ca-certificates \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    ca-certificates && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Ensure node user has access to /usr/local/share
 RUN chown -R node:node /usr/local/share
@@ -34,10 +36,10 @@ RUN chown -R node:node /usr/local/share
 ARG USERNAME=node
 
 # Persist shell history
-RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
-    && mkdir /commandhistory \
-    && touch /commandhistory/.bash_history \
-    && chown -R $USERNAME /commandhistory
+RUN SNIPPET="export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" && \
+    mkdir /commandhistory && \
+    touch /commandhistory/.bash_history && \
+    chown -R $USERNAME /commandhistory
 
 # Signal we are inside a container
 ENV DEVCONTAINER=true
@@ -76,8 +78,12 @@ RUN sh -c "$(wget -O- https://github.com/deluan/zsh-in-docker/releases/download/
     -a "export PROMPT_COMMAND='history -a' && export HISTFILE=/commandhistory/.bash_history" \
     -x
 
-# Enable pnpm and yarn via corepack (ships with Node, no extra install needed)
-RUN corepack enable && corepack prepare pnpm@latest --activate && corepack prepare yarn@stable --activate
+# Enable pnpm and yarn via corepack (requires root for global symlinks!)
+USER root
+RUN corepack enable && \
+    corepack prepare pnpm@latest --activate && \
+    corepack prepare yarn@stable --activate
+USER node
 
 # Install Claude Code using native installer
 RUN curl -fsSL https://claude.ai/install.sh | bash
