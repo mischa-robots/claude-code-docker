@@ -38,7 +38,8 @@ iptables -A INPUT  -i lo -j ACCEPT               # loopback
 iptables -A OUTPUT -o lo -j ACCEPT
 
 # ── 5. Create IP allowlist set ────────────────────────────────────────────────
-ipset create allowed-domains hash:ip
+ipset destroy allowed-domains 2>/dev/null || true
+ipset create allowed-domains hash:net maxelem 1048576 -exist
 
 # ── 6. Add GitHub IP ranges (fetched dynamically from GitHub meta API) ────────
 echo "Fetching GitHub IP ranges..."
